@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Nuestro Jardín Infinito 🤍</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Parisienne&family=Quicksand:wght@300;500;700&display=swap');
+
+        * { box-sizing: border-box; }
+
+        body {
+            background: radial-gradient(circle at bottom, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            min-height: 100vh;
+            margin: 0;
+            overflow-x: hidden;
+            font-family: 'Quicksand', sans-serif;
+            color: white;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        header {
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%;
+            text-align: center; 
+            padding: 15px 0;
+            z-index: 50;
+            background: linear-gradient(to bottom, rgba(15,32,39,0.9), transparent);
+            pointer-events: none;
+        }
+
+        h1 {
+            font-family: 'Parisienne', cursive;
+            font-size: 2.2rem; 
+            margin: 0;
+            background: linear-gradient(to right, #fff, #ffdde1, #fff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 10px rgba(255,192,203,0.3));
+        }
+
+        .season-selector {
+            position: fixed; 
+            top: 75px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            z-index: 60; 
+            display: flex; 
+            gap: 8px; 
+            background: rgba(0,0,0,0.6); 
+            padding: 8px 12px; 
+            border-radius: 20px; 
+            backdrop-filter: blur(10px);
+            pointer-events: auto;
+        }
+
+        .season-btn {
+            background: rgba(192, 57, 43, 0.8);
+            color: white; 
+            border: none; 
+            padding: 10px 14px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-size: 1.3rem;
+            transition: all 0.3s;
+        }
+
+        .season-btn:active {
+            transform: scale(0.9);
+        }
+
+        .season-btn.active {
+            background: #c0392b;
+            box-shadow: 0 0 20px rgba(255,255,255,0.6);
+            transform: scale(1.1);
+        }
+
+        #garden-container {
+            display: flex;
+            flex-direction: row;
+            gap: 60px;
+            padding: 180px 40px 100px 40px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            min-height: 100vh;
+            align-items: flex-end;
+        }
+
+        #garden-container::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        #garden-container::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        #garden-container::-webkit-scrollbar-thumb {
+            background: rgba(192, 57, 43, 0.6);
+            border-radius: 10px;
+        }
+
+        .tree-wrapper {
+            position: relative;
+            min-width: 350px;
+            height: 500px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .tree-visual {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* PINO NAVIDEÑO */
+        .tree-visual.navidad .trunk {
+            width: 50px;
+            height: 80px;
+            background: linear-gradient(to right, #3e2723, #5d4037, #3e2723);
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .tree-visual.navidad .branch {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #1b5e20, #2e7d32, #43a047);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+            transition: all 0.5s ease;
+        }
+
+        .tree-visual.navidad .layer1 {
+            width: 320px;
+            height: 180px;
+            bottom: 70px;
+            z-index: 3;
+        }
+
+        .tree-visual.navidad .layer2 {
+            width: 260px;
+            height: 150px;
+            bottom: 180px;
+            z-index: 4;
+        }
+
+        .tree-visual.navidad .layer3 {
+            width: 200px;
+            height: 120px;
+            bottom: 280px;
+            z-index: 5;
+        }
+
+        .tree-visual.navidad .layer4 {
+            width: 140px;
+            height: 90px;
+            bottom: 360px;
+            z-index: 6;
+        }
+
+        /* CEREZO PRIMAVERAL */
+        .tree-visual.primavera .trunk {
+            width: 60px;
+            height: 150px;
+            background: linear-gradient(to right, #5d4037, #6d4c41, #5d4037);
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .tree-visual.primavera .branch {
+            position: absolute;
+            background: radial-gradient(circle, #ffb3d9 20%, #ff69b4 60%, #ff1493 100%);
+            border-radius: 50%;
+            box-shadow: 0 8px 25px rgba(255, 20, 147, 0.4);
+            transition: all 0.5s ease;
+        }
+
+        .tree-visual.primavera .layer1 {
+            width: 280px;
+            height: 280px;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+
+        .tree-visual.primavera .layer2 {
+            width: 220px;
+            height: 220px;
+            bottom: 220px;
+            left: 55%;
+            transform: translateX(-50%);
+            z-index: 4;
+        }
+
+        .tree-visual.primavera .layer3 {
+            width: 180px;
+            height: 180px;
+            bottom: 280px;
+            left: 45%;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+
+        /* ÁRBOL OTOÑAL */
+        .tree-visual.otono .trunk {
+            width: 55px;
+            height: 140px;
+            background: linear-gradient(to right, #4e342e, #5d4037, #4e342e);
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .tree-visual.otono .branch {
+            position: absolute;
+            background: radial-gradient(circle, #ffb300 0%, #ff8f00 50%, #ff6f00 100%);
+            border-radius: 50%;
+            box-shadow: 0 8px 25px rgba(255, 111, 0, 0.4);
+            transition: all 0.5s ease;
+        }
+
+        .tree-visual.otono .layer1 {
+            width: 300px;
+            height: 300px;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+        }
+
+        .tree-visual.otono .layer2 {
+            width: 240px;
+            height: 240px;
+            bottom: 210px;
+            left: 48%;
+            transform: translateX(-50%);
+            z-index: 4;
+        }
+
+        .tree-visual.otono .layer3 {
+            width: 180px;
+            height: 180px;
+            bottom: 300px;
+            left: 52%;
+            transform: translateX(-50%);
+            z-index: 5;
+        }
+
+        /* PALMERA VERANO */
+        .tree-visual.verano .trunk {
+            width: 55px;
+            height: 220px;
+            background: linear-gradient(to right, #6d4c41, #8d6e63, #6d4c41);
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            border-radius: 50% 50% 5px 5px / 20% 20% 5px 5px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .tree-visual.verano .trunk::before,
+        .tree-visual.verano .trunk::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 8px;
+            background: rgba(62, 39, 35, 0.3);
+            left: 0;
+        }
+
+        .tree-visual.verano .trunk::before { top: 30%; }
+        .tree-visual.verano .trunk::after { top: 60%; }
+
+        .tree-visual.verano .branch {
+            position: absolute;
+            background: radial-gradient(ellipse, #66bb6a 0%, #43a047 50%, #2e7d32 100%);
+            border-radius: 50%;
+            box-shadow: 0 8px 25px rgba(46, 125, 50, 0.4);
+            transition: all 0.5s ease;
+            clip-path: ellipse(50% 40% at 50% 50%);
+        }
+
+        .tree-visual.verano .layer1 {
+            width: 280px;
+            height: 140px;
+            bottom: 200px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-20deg);
+            z-index: 3;
+        }
+
+        .tree-visual.verano .layer2 {
+            width: 280px;
+            height: 140px;
+            bottom: 220px;
+            left: 50%;
+            transform: translateX(-50%) rotate(20deg);
+            z-index: 4;
+        }
+
+        .tree-visual.verano .layer3 {
+            width: 260px;
+            height: 130px;
+            bottom: 240px;
+            left: 50%;
+            transform: translateX(-50%) rotate(-10deg);
+            z-index: 5;
+        }
+
+        .tree-visual.verano .layer4 {
+            width: 260px;
+            height: 130px;
+            bottom: 260px;
+            left: 50%;
+            transform: translateX(-50%) rotate(10deg);
+            z-index: 6;
+        }
+
+        .star-rose {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 55px;
+            z-index: 20;
+            filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.9));
+            animation: pulse 3s infinite ease-in-out;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0%, 100% { 
+                transform: translateX(-50%) scale(1); 
+                filter: drop-shadow(0 0 25px rgba(255, 255, 255, 0.9));
+            }
+            50% { 
+                transform: translateX(-50%) scale(1.2); 
+                filter: drop-shadow(0 0 35px rgba(255, 255, 255, 1));
+            }
+        }
+
+        .rose {
+            position: absolute;
+            font-size: 28px;
+            cursor: pointer;
+            user-select: none;
+            z-index: 10;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            -webkit-tap-highlight-color: transparent;
+            filter: drop-shadow(0 3px 5px rgba(0,0,0,0.3));
+        }
+
+        .rose:active { transform: scale(1.6) rotate(10deg); }
+        .rose:hover { transform: scale(1.5) rotate(15deg); }
+
+        .rose-white {
+            filter: grayscale(100%) brightness(400%) drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+        }
+
+        .rose-red {
+            filter: brightness(140%) saturate(180%) drop-shadow(0 0 8px rgba(255, 0, 0, 0.7));
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal.active { opacity: 1; }
+        .modal.active .note-card { transform: scale(1); }
+
+        .note-card {
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 25px;
+            width: 90%;
+            max-width: 360px;
+            text-align: center;
+            color: #333;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            transform: scale(0.8);
+            transition: transform 0.3s;
+        }
+
+        .note-card h2 {
+            font-family: 'Parisienne', cursive;
+            color: #c0392b;
+            font-size: 2.2rem;
+            margin: 0 0 10px 0;
+        }
+
+        .author-tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffebee, #ffc1cc);
+            color: #c0392b;
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .note-card p {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: #555;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            border: none;
+            padding: 12px 18px;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: 'Quicksand';
+            font-size: 0.95rem;
+        }
+
+        button:active { transform: scale(0.95); }
+        button:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        .btn-close { background: #95a5a6; color: white; }
+        .btn-edit { background: #f39c12; color: white; }
+        .btn-delete { background: #e74c3c; color: white; }
+        .btn-save {
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: white;
+            width: 100%;
+            padding: 14px;
+            font-size: 1.05rem;
+            margin-top: 10px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            background: rgba(255,255,255,0.95);
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            padding: 14px;
+            font-family: 'Quicksand';
+            font-size: 1rem;
+            margin-bottom: 15px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            border-color: #c0392b;
+            box-shadow: 0 0 10px rgba(192, 57, 43, 0.2);
+        }
+
+        .add-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c0392b, #e74c3c);
+            color: white;
+            font-size: 40px;
+            border: none;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 50;
+            box-shadow: 0 10px 30px rgba(192, 57, 43, 0.6);
+            transition: all 0.3s;
+        }
+
+        .add-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+            box-shadow: 0 15px 40px rgba(192, 57, 43, 0.8);
+        }
+
+        .add-btn:active { transform: scale(0.95); }
+
+        .snowflake {
+            position: fixed;
+            top: -20px;
+            color: rgba(255, 255, 255, 0.8);
+            animation: fall linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(110vh) rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8rem; }
+            .season-selector { top: 65px; gap: 6px; padding: 6px 10px; }
+            .season-btn { padding: 8px 10px; font-size: 1.1rem; }
+            #garden-container { gap: 40px; padding: 160px 20px 80px 20px; }
+            .tree-wrapper { min-width: 300px; height: 450px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Nuestro Jardín Infinito 🤍</h1>
+    </header>
+
+    <div class="season-selector">
+        <button class="season-btn active" onclick="changeTreeType('navidad')" data-season="navidad">🎄</button>
+        <button class="season-btn" onclick="changeTreeType('primavera')" data-season="primavera">🌸</button>
+        <button class="season-btn" onclick="changeTreeType('otono')" data-season="otono">🍂</button>
+        <button class="season-btn" onclick="changeTreeType('verano')" data-season="verano">🌴</button>
+    </div>
+
+    <div id="garden-container"></div>
+
+    <div class="add-btn" onclick="openAddModal()">+</div>
+
+    <div class="modal" id="readModal" onclick="closeModals()">
+        <div class="note-card" onclick="event.stopPropagation()">
+            <h2 id="displayTitle">Título</h2>
+            <span id="displayAuthor" class="author-tag">Autor</span>
+            <p id="displayMsg">Mensaje</p>
+            <div class="btn-group">
+                <button class="btn-edit" onclick="editCurrentNote()">✏️ Editar</button>
+                <button class="btn-delete" onclick="deleteCurrentNote()">🗑️ Borrar</button>
+                <button class="btn-close" onclick="closeModals()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="addModal" onclick="closeModals()">
+        <div class="note-card" onclick="event.stopPropagation()">
+            <h2 id="modalTitle">Nueva Rosa</h2>
+            <select id="inputAuthor">
+                <option value="" disabled selected>¿Quién eres?</option>
+                <option value="Carlos">Soy Carlos (Rosa Roja)</option>
+                <option value="Mile">Soy Mile (Rosa Blanca)</option>
+            </select>
+            <input type="text" id="inputTitle" placeholder="Título (ej: Te amo)" maxlength="25">
+            <textarea id="inputMsg" rows="4" placeholder="Escribe algo bonito..."></textarea>
+            <input type="password" id="inputPass" placeholder="Código Secreto" style="border: 2px solid #c0392b;">
+            <button class="btn-save" onclick="saveNote()">💕 Guardar en el Jardín</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, doc, updateDoc, onSnapshot, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCgdLzB5VnU0AgmLao2YjhxRzkAE44oJ6Y",
+            authDomain: "regalonavidad-6a859.firebaseapp.com",
+            projectId: "regalonavidad-6a859",
+            storageBucket: "regalonavidad-6a859.firebasestorage.app",
+            messagingSenderId: "546173421314",
+            appId: "1:546173421314:web:88c7c31b90668057b1641b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const notesCollection = collection(db, "mensajes_arbol");
+
+        const CODIGO_SECRETO = "0110";
+        const ROSAS_POR_ARBOL = 2;
+        let currentTreeType = 'navidad';
+
+        const gardenContainer = document.getElementById('garden-container');
+        const readModal = document.getElementById('readModal');
+        const addModal = document.getElementById('addModal');
+
+        let currentNoteId = null;
+        let isEditing = false;
+
+        const q = query(
+            notesCollection,
+            where("activo", "==", true),
+            orderBy("fecha", "asc")
+        );
+
+        onSnapshot(q, (snapshot) => {
+            renderGarden(snapshot.docs);
+        }, (error) => {
+            console.error(error);
+            if(error.message.includes("index")) {
+                Swal.fire({
+                    icon: 'info',
+                    title: 'Configuración Firebase',
+                    text: 'Necesitas crear un índice compuesto en Firebase Console.',
+                });
+            }
+        });
+
+        function renderGarden(docs) {
+            gardenContainer.innerHTML = '';
+            const totalRoses = docs.length;
+            const totalTrees = Math.max(1, Math.ceil(totalRoses / ROSAS_POR_ARBOL));
+            const treeElements = [];
+
+            for (let i = 0; i < totalTrees; i++) {
+                const treeObj = createTree(i);
+                gardenContainer.appendChild(treeObj.wrapper);
+                treeElements.push(treeObj.visual);
+            }
+
+            docs.forEach((doc, index) => {
+                const treeIndex = Math.floor(index / ROSAS_POR_ARBOL);
+                const visualTree = treeElements[treeIndex];
+                if(visualTree) {
+                    createRoseInTree(visualTree, doc.data(), doc.id);
+                }
+            });
+        }
+
+        function createTree(index) {
+            const wrapper = document.createElement('div');
+            wrapper.classList.add('tree-wrapper');
+            const visual = document.createElement('div');
+            visual.classList.add('tree-visual', currentTreeType);
+
+            const treeMessages = {
+                navidad: `🎄 Árbol ${index+1}\n\nNuestro amor es eterno como la Navidad\n\nCada rosa es un "te amo" 💕`,
+                primavera: `🌸 Cerezo ${index+1}\n\nNuestro amor florece cada día\n\nComo las flores que nunca se marchitan 💕`,
+                otono: `🍂 Árbol ${index+1}\n\nNuestro amor es cálido como el otoño\n\nBello en cada estación 💕`,
+                verano: `🌴 Palmera ${index+1}\n\nNuestro amor es un paraíso\n\nJuntos bajo el sol 💕`
+            };
+
+            const starIcon = {
+                navidad: '🌟',
+                primavera: '🦋',
+                otono: '🍁',
+                verano: '☀️'
+            };
+
+            const layerCount = currentTreeType === 'navidad' || currentTreeType === 'verano' ? 4 : 3;
+            let branchesHTML = '<div class="trunk"></div>';
+            for(let i = 1; i <= layerCount; i++) {
+                branchesHTML += `<div class="branch layer${i}"></div>`;
+            }
+
+            visual.innerHTML = branchesHTML + `<div class="star-rose">${starIcon[currentTreeType]}</div>`;
+
+            const star = visual.querySelector('.star-rose');
+            star.onclick = () => showTreeMessage(treeMessages[currentTreeType]);
+
+            wrapper.appendChild(visual);
+            return { wrapper, visual };
+        }
+
+        window.showTreeMessage = (message) => {
+            Swal.fire({
+                html: message.replace(/\n/g, '<br>'),
+                icon: 'success',
+                confirmButtonColor: '#c0392b',
+                confirmButtonText: 'Te amo ❤️',
+                background: 'linear-gradient(135deg, #fff 0%, #ffe0e6 100%)',
+            });
+        }
+
+        window.changeTreeType = (type) => {
+            currentTreeType = type;
+
+            document.querySelectorAll('.season-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`[data-season="${type}"]`).classList.add('active');
+
+            const allTrees = document.querySelectorAll('.tree-visual');
+            allTrees.forEach((tree, treeIndex) => {
+                tree.className = 'tree-visual ' + type;
+
+                const treeMessages = {
+                    navidad: `🎄 Árbol ${treeIndex+1}\n\nNuestro amor es eterno como la Navidad\n\nCada rosa es un "te amo" 💕`,
+                    primavera: `🌸 Cerezo ${treeIndex+1}\n\nNuestro amor florece cada día\n\nComo las flores que nunca se marchitan 💕`,
+                    otono: `🍂 Árbol ${treeIndex+1}\n\nNuestro amor es cálido como el otoño\n\nBello en cada estación 💕`,
+                    verano: `🌴 Palmera ${treeIndex+1}\n\nNuestro amor es un paraíso\n\nJuntos bajo el sol 💕`
+                };
+
+                const starIcon = {
+                    navidad: '🌟',
+                    primavera: '🦋',
+                    otono: '🍁',
+                    verano: '☀️'
+                };
+
+                const star = tree.querySelector('.star-rose');
+                star.textContent = starIcon[type];
+                star.onclick = () => showTreeMessage(treeMessages[type]);
+
+                const existingBranches = tree.querySelectorAll('.branch').length;
+                const neededLayers = type === 'navidad' || type === 'verano' ? 4 : 3;
+
+                if(existingBranches < neededLayers) {
+                    for(let i = existingBranches + 1; i <= neededLayers; i++) {
+                        const newBranch = document.createElement('div');
+                        newBranch.className = `branch layer${i}`;
+                        tree.insertBefore(newBranch, star);
+                    }
+                } else if(existingBranches > neededLayers) {
+                    const toRemove = tree.querySelectorAll('.branch');
+                    for(let i = neededLayers; i < toRemove.length; i++) {
+                        toRemove[i].remove();
+                    }
+                }
+            });
+        }
+
+        function createRoseInTree(visualTree, data, id) {
+            const rose = document.createElement('div');
+            rose.classList.add('rose');
+            rose.textContent = '🌹';
+
+            if (data.autor === 'Carlos') {
+                rose.classList.add('rose-red');
+            } else {
+                rose.classList.add('rose-white');
+            }
+
+            const randomLayer = Math.floor(Math.random() * 3);
+            let bottom, left;
+
+            if(randomLayer === 0) {
+                bottom = 100 + Math.random() * 120;
+                left = 20 + Math.random() * 60;
+            } else if (randomLayer === 1) {
+                bottom = 220 + Math.random() * 100;
+                left = 25 + Math.random() * 50;
+            } else {
+                bottom = 320 + Math.random() * 80;
+                left = 35 + Math.random() * 30;
+            }
+
+            rose.style.bottom = bottom + 'px';
+            rose.style.left = left + '%';
+            rose.onclick = () => showNote(data, id);
+            visualTree.appendChild(rose);
+        }
+
+        window.showNote = (data, id) => {
+            currentNoteId = id;
+            document.getElementById('displayTitle').innerText = data.titulo;
+            document.getElementById('displayMsg').innerText = data.mensaje;
+            document.getElementById('displayAuthor').innerText = `De: ${data.autor}`;
+            readModal.style.display = "flex";
+            setTimeout(() => readModal.classList.add('active'), 10);
+        }
+
+        window.openAddModal = () => {
+            isEditing = false;
+            currentNoteId = null;
+            document.getElementById('modalTitle').innerText = "Nueva Rosa";
+            document.getElementById('inputTitle').value = "";
+            document.getElementById('inputMsg').value = "";
+            document.getElementById('inputPass').value = "";
+            document.getElementById('inputAuthor').value = "";
+            addModal.style.display = "flex";
+            setTimeout(() => addModal.classList.add('active'), 10);
+        }
+
+        window.editCurrentNote = () => {
+            isEditing = true;
+            const currentAuthor = document.getElementById('displayAuthor').innerText.replace('De: ', '');
+            closeModals();
+            setTimeout(() => {
+                document.getElementById('modalTitle').innerText = "Editar Rosa";
+                document.getElementById('inputTitle').value = document.getElementById('displayTitle').innerText;
+                document.getElementById('inputMsg').value = document.getElementById('displayMsg').innerText;
+                document.getElementById('inputAuthor').value = currentAuthor;
+                addModal.style.display = "flex";
+                setTimeout(() => addModal.classList.add('active'), 10);
+            }, 300);
+        }
+
+        window.saveNote = async () => {
+            const title = document.getElementById('inputTitle').value.trim();
+            const msg = document.getElementById('inputMsg').value.trim();
+            const author = document.getElementById('inputAuthor').value;
+            const pass = document.getElementById('inputPass').value.trim();
+
+            if(!title || !msg || !author || !pass) {
+                return Swal.fire('Ups', 'Completa todos los campos', 'warning');
+            }
+            if(pass !== CODIGO_SECRETO) {
+                return Swal.fire('Error', 'Código incorrecto', 'error');
+            }
+
+            Swal.fire({title: 'Guardando...', didOpen: () => Swal.showLoading()});
+
+            try {
+                if(isEditing && currentNoteId) {
+                    await updateDoc(doc(db, "mensajes_arbol", currentNoteId), {
+                        titulo: title,
+                        mensaje: msg,
+                        autor: author
+                    });
+                    Swal.fire('¡Listo!', 'Rosa actualizada con amor 💕', 'success');
+                } else {
+                    await addDoc(notesCollection, {
+                        titulo: title,
+                        mensaje: msg,
+                        autor: author,
+                        fecha: new Date().toISOString(),
+                        activo: true
+                    });
+                    Swal.fire('¡Plantada!', 'Nueva rosa en el jardín 🌹', 'success');
+                }
+                closeModals();
+            } catch (e) {
+                console.error(e);
+                Swal.fire('Error', 'No se pudo guardar', 'error');
+            }
+        }
+
+        window.deleteCurrentNote = async () => {
+            const { value: pass } = await Swal.fire({
+                title: '¿Quitar esta Rosa?',
+                text: 'Ingresa el código secreto',
+                input: 'password',
+                showCancelButton: true,
+                confirmButtonColor: '#e74c3c',
+                cancelButtonColor: '#95a5a6',
+                confirmButtonText: 'Sí, borrar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (pass === CODIGO_SECRETO) {
+                try {
+                    await updateDoc(doc(db, "mensajes_arbol", currentNoteId), { activo: false });
+                    closeModals();
+                    Swal.fire('Borrada', 'Rosa retirada del jardín', 'success');
+                } catch (e) {
+                    Swal.fire('Error', 'Error al borrar', 'error');
+                }
+            } else if (pass) {
+                Swal.fire('Error', 'Código incorrecto', 'error');
+            }
+        }
+
+        window.closeModals = () => {
+            readModal.classList.remove('active');
+            addModal.classList.remove('active');
+            setTimeout(() => {
+                readModal.style.display = "none";
+                addModal.style.display = "none";
+                document.getElementById('inputPass').value = "";
+            }, 300);
+        }
+
+        function createSnow() {
+            const symbols = ['❄', '❅', '❆', '•'];
+            for(let i=0; i<50; i++) {
+                const snow = document.createElement('div');
+                snow.classList.add('snowflake');
+                snow.textContent = symbols[Math.floor(Math.random()*symbols.length)];
+                snow.style.left = Math.random() * 100 + 'vw';
+                snow.style.animationDuration = 5 + Math.random() * 15 + 's';
+                snow.style.opacity = Math.random() * 0.6 + 0.2;
+                snow.style.fontSize = Math.random() * 15 + 8 + 'px';
+                snow.style.filter = `blur(${Math.random()}px)`;
+                document.body.appendChild(snow);
+            }
+        }
+        createSnow();
+    </script>
+</body>
+</html>
